@@ -17,30 +17,36 @@ class InventorySearch {
     }
 
     attachEventListeners() {
-        // Search input listeners with debouncing
-        ['input', 'change'].forEach(event => {
-            this.serialInput?.addEventListener(event, () => this.debounceSearch());
-            this.searchInput?.addEventListener(event, () => this.debounceSearch());
-            this.sectionSelect?.addEventListener(event, () => this.debounceSearch());
-        });
-
-        // Sort header listeners
-        this.tableHeaders.forEach(header => {
-            header.addEventListener('click', () => this.handleSort(header));
-        });
-
-        // Search help tooltip
-        this.searchHelp?.addEventListener('click', () => this.showSearchHelp());
+    // Add event listener for the search button
+    const searchButton = document.getElementById('search-button');
+    if (searchButton) {
+        searchButton.addEventListener('click', () => this.performSearch());
     }
+
+    // Search input listeners with debouncing
+    ['input', 'change'].forEach(event => {
+        this.serialInput?.addEventListener(event, () => this.debounceSearch());
+        this.searchInput?.addEventListener(event, () => this.debounceSearch());
+        this.sectionSelect?.addEventListener(event, () => this.debounceSearch());
+    });
+
+    // Sort header listeners
+    this.tableHeaders.forEach(header => {
+        header.addEventListener('click', () => this.handleSort(header));
+    });
+
+    // Search help tooltip
+    this.searchHelp?.addEventListener('click', () => this.showSearchHelp());
+}
+
 
     showSearchHelp() {
         const helpText = `
 Search Tips:
-- Use quotes for exact phrases: "blue widget"
-- Use AND/OR for multiple terms: blue AND widget
-- Use parentheses for grouping: (blue OR red) AND widget
-- Serial number has a dedicated search field
-- Click column headers to sort
+- Enter any keyword to perform a general search across all fields.
+- Serial number search is dedicated and only looks in the serial number field.
+- Use partial keywords for broader results: e.g., 'oil' will match 'motor oil'.
+- Click column headers to sort results.
 `;
         alert(helpText); // Replace with your preferred tooltip/modal implementation
     }

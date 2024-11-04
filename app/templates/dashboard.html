@@ -5,6 +5,77 @@
 
 {% block content %}
 <div class="space-y-6">
+ <!-- Stats Cards -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Total Items Card -->
+      <a href="{{ url_for('views.inventory') }}" class="bg-white overflow-hidden shadow rounded-lg transition-transform hover:scale-105 hover:shadow-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Items</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ stats.total_items }}</dd>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Total Quantity Card -->
+      <a href="{{ url_for('views.inventory') }}" class="bg-white overflow-hidden shadow rounded-lg transition-transform hover:scale-105 hover:shadow-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Quantity</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ stats.total_quantity }}</dd>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Out of Stock Items Card -->
+      <a href="{{ url_for('views.inventory', filter='out_of_stock') }}" class="bg-white overflow-hidden shadow rounded-lg transition-transform hover:scale-105 hover:shadow-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
+              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dt class="text-sm font-medium text-gray-500 truncate">Out of Stock Items</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ stats.out_of_stock }}</dd>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Serial Number Conflicts Card -->
+      <a href="{{ url_for('views.conflicts') }}" class="bg-white overflow-hidden shadow rounded-lg transition-transform hover:scale-105 hover:shadow-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+              <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dt class="text-sm font-medium text-gray-500 truncate">Serial Number Conflicts</dt>
+              <dd class="text-lg font-medium text-gray-900">{{ stats.duplicate_serials }}</dd>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+
     <!-- Recent Items Table -->
     <div class="bg-white shadow rounded-lg overflow-hidden">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
