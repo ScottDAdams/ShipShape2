@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="{{ url_for('static', filename='css/output.css') }}" rel="stylesheet">
+
+</head>
+<body class="h-full" x-data="{ sidebarOpen: true }">
+    <div class="min-h-full">
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 transition duration-300 transform"
+             :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
+            <!-- Logo -->
+            <div class="flex items-center justify-center h-16 bg-gray-800">
+                <div class="flex items-center space-x-2">
+                    <img src="{{ url_for('static', filename='img/shipicon.png') }}"
+                         class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                    <span class="text-white text-lg font-semibold">ShipShape</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="mt-4">
+                <a href="{{ url_for('views.dashboard') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-100 hover:bg-gray-800">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="{{ url_for('views.inventory') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-100 hover:bg-gray-800">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                    Inventory
+                </a>
+
+                <a href="{{ url_for('views.conflicts') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-100 hover:bg-gray-800">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Conflicts
+                </a>
+
+                <a href="{{ url_for('views.cycle_count') }}"
+                   class="flex items-center px-4 py-2 text-sm text-gray-100 hover:bg-gray-800">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Cycle Count
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="pl-64 flex flex-col flex-1" :class="{ 'pl-0': !sidebarOpen }">
+            <!-- Top bar -->
+            <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+                <button type="button"
+                        class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden"
+                        @click="sidebarOpen = !sidebarOpen">
+                    <span class="sr-only">Open sidebar</span>
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <div class="flex-1 px-4 flex justify-between">
+                    <div class="flex-1 flex">
+                        <!-- Search bar could go here -->
+                    </div>
+                    <div class="ml-4 flex items-center lg:ml-6">
+                        <span class="text-sm text-gray-500">Admin</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content area -->
+            <main class="flex-1">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

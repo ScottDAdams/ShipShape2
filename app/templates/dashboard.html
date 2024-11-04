@@ -1,0 +1,130 @@
+<!-- app/templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Recent Items Table -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Items</h3>
+            <a href="{{ url_for('views.inventory') }}" class="text-sm text-blue-600 hover:text-blue-800">View All →</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <colgroup>
+                    <col class="w-400px">
+                    <col class="w-150px">
+                    <col class="w-100px">
+                    <col class="w-75px">
+                    <col class="w-90px">
+                    <col class="w-90px">
+                    <col class="w-100px">
+                </colgroup>
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                        <th class="px-4 py-3 relative"><span class="sr-only">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in recent_items %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate" style="width: 300px; max-width: 300px;">{{ item.name }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 truncate" style="width: 150px; max-width: 150px;">{{ item.boat_section.name if item.boat_section else '-' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 truncate" style="width: 90px; max-width: 90px;">{{ item.shelf or '-' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 75px; max-width: 75px;">{{ item.box or '-' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 90px; max-width: 90px;">{{ item.serial_number or '-' }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 90px; max-width: 90px;">{{ item.quantity|default(0) }}</td>
+                        <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex items-center space-x-3">
+                                <a href="{{ url_for('views.inventory_detail', item_id=item.id) }}" class="text-blue-600 hover:text-blue-900" title="View Details">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ url_for('views.inventory_edit', item_id=item.id) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit Item">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Low Stock Items -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 flex items-center">
+                <svg class="h-6 w-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Low Stock Items
+            </h3>
+            <a href="{{ url_for('views.inventory', filter='low_stock') }}" class="text-sm text-red-600 hover:text-red-800">
+                View All Low Stock →
+            </a>
+        </div>
+        <div class="flex flex-col">
+            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                    <div class="overflow-hidden border-b border-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for item in low_stock_items %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 truncate" style="width: 300px; max-width: 300px;">{{ item.name }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 truncate" style="width: 150px; max-width: 150px;">{{ item.boat_section.name if item.boat_section else '-' }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 truncate" style="width: 90px; max-width: 90px;">{{ item.shelf or '-' }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 75px; max-width: 75px;">{{ item.box or '-' }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 90px; max-width: 90px;">{{ item.serial_number or '-' }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500" style="width: 90px; max-width: 90px;">{{ item.quantity|default(0) }}</td>
+                                    <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center space-x-3">
+                                            <a href="{{ url_for('views.inventory_detail', item_id=item.id) }}"
+                                               class="text-blue-600 hover:text-blue-900" title="View Details">
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                </svg>
+                                            </a>
+                                            <a href="{{ url_for('views.inventory_edit', item_id=item.id) }}"
+                                               class="text-indigo-600 hover:text-indigo-900" title="Edit Item">
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

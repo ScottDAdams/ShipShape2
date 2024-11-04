@@ -1,0 +1,15 @@
+/* tailwind.config.css */
+@layer utilities {
+  .w-400px {
+    width: 400px !important;
+  }
+  .w-150px {
+    width: 150px !important;
+  }
+  .w-75px {
+    width: 75px !important;
+  }
+  .w-90px {
+    width: 90px !important;
+  }
+}

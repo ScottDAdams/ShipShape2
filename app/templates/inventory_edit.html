@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ item.name }}{% endblock %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <form method="POST" enctype="multipart/form-data">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-200">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Edit Item</h3>
+          <p class="mt-1 text-sm text-gray-500">Update item information and properties.</p>
+        </div>
+        
+        <div class="flex space-x-3">
+          <a href="{{ url_for('views.inventory_detail', item_id=item.id) }}" 
+             class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </a>
+          
+          <button type="submit"
+                  class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class="rounded-md bg-{{ 'green' if category == 'success' else 'red' }}-50 p-4 mx-6 mt-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                {% if category == 'success' %}
+                <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {% else %}
+                <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {% endif %}
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-{{ 'green' if category == 'success' else 'red' }}-800">
+                  {{ message }}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-6 gap-6">
+          <!-- Name -->
+          <div class="col-span-6 sm:col-span-4">
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" name="name" id="name" value="{{ item.name }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Boat Section -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+            <select id="boat_section_id" name="boat_section_id"
+                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option value="">Select Section</option>
+              {% for section in sections %}
+                <option value="{{ section.id }}" {% if item.boat_section_id == section.id %}selected{% endif %}>
+                  {{ section.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Shelf -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+            <input type="text" name="shelf" id="shelf" value="{{ item.shelf }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Box -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+            <input type="text" name="box" id="box" value="{{ item.box }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Quantity -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+            <input type="number" name="quantity" id="quantity" value="{{ item.quantity }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Serial Number -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+            <input type="text" name="serial_number" id="serial_number" value="{{ item.serial_number }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Part Number -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="part_number" class="block text-sm font-medium text-gray-700">Part Number</label>
+            <input type="text" name="part_number" id="part_number" value="{{ item.part_number }}"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+          </div>
+
+          <!-- Current Images -->
+          <div class="col-span-6">
+            <h4 class="text-sm font-medium text-gray-500">Current Images</h4>
+            <div class="mt-4 flex flex-col items-center justify-center">
+              {% if item.photos and item.photos|length > 0 %}
+                {% for photo in item.photos %}
+                  <img src="{{ photo.url }}" 
+                       alt="Photo of {{ item.name }}"
+                       class="h-64 w-64 object-cover rounded-md shadow-lg mb-4">
+                {% endfor %}
+              {% else %}
+                <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
+                     alt="No image available"
+                     class="h-64 w-64 object-cover rounded-md shadow-lg">
+                <p class="mt-2 text-sm text-gray-500">No image available. Upload one below.</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Upload New Image -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
+            <input type="file" name="image" id="image" accept="image/*"
+                   class="mt-1 block w-full shadow-sm sm:text-sm">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg mt-6">
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg mt-6">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-red-600">Danger Zone</h3>
+      </div>
+
+      <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+        <div class="sm:flex sm:items-center sm:justify-between">
+          <div>
+            <h3 class="text-sm font-medium text-gray-900">Delete this item</h3>
+            <div class="mt-1 text-sm text-gray-500">
+              Once you delete an item, it cannot be recovered. Please be certain.
+            </div>
+          </div>
+
+          <div class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
+            <form method="POST" action="{{ url_for('views.inventory_delete', item_id=item.id) }}"
+                  onsubmit="return confirm('Are you sure you want to delete this item? This action cannot be undone.');">
+              <button type="submit"
+                      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Item
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
