@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}Add New Item{% endblock %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <form method="POST" enctype="multipart/form-data">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-200">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Add New Item</h3>
+      </div>
+
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-6 gap-6">
+          <!-- Serial Number -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+            <div class="mt-1 relative rounded-md shadow-sm">
+              <input type="text" name="serial_number" id="serial_number" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md" placeholder="Enter or scan serial number">
+              <button type="button" id="serial-search-button" class="absolute inset-y-0 right-0 px-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1111.446 3.032l4.743 4.744a1 1 0 01-1.414 1.414l-4.744-4.743A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Box -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+            <input type="text" name="box" id="box"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                   placeholder="Enter box number">
+          </div>
+
+          <!-- Boat Section -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+            <select id="boat_section_id" name="boat_section_id"
+                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option value="">Select Section</option>
+              {% for section in sections %}
+                <option value="{{ section.id }}">{{ section.name }}</option>
+              {% endfor %}
+              <option value="new_section">Add New Section</option>
+            </select>
+            <div id="new-section-input" class="mt-2 hidden">
+              <label for="new_section_name" class="text-sm font-medium text-gray-700">New Section Name</label>
+              <input type="text" id="new_section_name" name="new_section_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+          </div>
+
+          <!-- Shelf -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+            <select id="shelf" name="shelf"
+                    class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option value="">Select Shelf</option>
+              <!-- Shelves will be dynamically populated based on the boat section -->
+              <option value="new_shelf">Add New Shelf</option>
+            </select>
+            <div id="new-shelf-input" class="mt-2 hidden">
+              <label for="new_shelf_name" class="text-sm font-medium text-gray-700">New Shelf Name</label>
+              <input type="text" id="new_shelf_name" name="new_shelf_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+          </div>
+
+          <!-- Item Name -->
+          <div class="col-span-6 sm:col-span-4">
+            <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
+            <input type="text" name="name" id="name"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                   placeholder="Enter item name">
+          </div>
+
+          <!-- Part Number -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="part_number" class="block text-sm font-medium text-gray-700">Part Number</label>
+            <input type="text" name="part_number" id="part_number"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                   placeholder="Enter part number (optional)">
+          </div>
+
+          <!-- Quantity -->
+          <div class="col-span-6 sm:col-span-2">
+            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+            <input type="number" name="quantity" id="quantity"
+                   class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                   placeholder="Enter quantity">
+          </div>
+
+          <!-- Upload New Image -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
+            <input type="file" name="image" id="image" accept="image/*"
+                   class="mt-1 block w-full shadow-sm sm:text-sm">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Search Results -->
+  <div id="search-results" class="mt-6 hidden">
+    <h4 class="text-lg leading-6 font-medium text-gray-900 mb-4">Search Results</h4>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <colgroup>
+            <col class="w-400px">
+            <col class="w-150px">
+            <col class="w-100px">
+            <col class="w-75px">
+            <col class="w-90px">
+            <col class="w-90px">
+            <col class="w-100px">
+        </colgroup>
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th class="px-4 py-3 relative"><span class="sr-only">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody id="results-body" class="bg-white divide-y divide-gray-200">
+            <!-- Search results will be dynamically populated here -->
+        </tbody>
+    </table>
+
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const serialSearchButton = document.getElementById('serial-search-button');
+    const serialNumberInput = document.getElementById('serial_number');
+    const boatSectionSelect = document.getElementById('boat_section_id');
+    const shelfSelect = document.getElementById('shelf');
+    const nameInput = document.getElementById('name');
+    const partNumberInput = document.getElementById('part_number');
+    const quantityInput = document.getElementById('quantity');
+    const boxInput = document.getElementById('box');
+
+    // Disable all fields initially except serial number
+    disableFields(true);
+
+    // Serial Number Search Trigger
+    serialSearchButton.addEventListener('click', async function () {
+        const serialNumber = serialNumberInput.value.trim();
+        if (serialNumber) {
+            try {
+                const response = await fetch(`/inventory/data?serial=${serialNumber}`);
+                const data = await response.json();
+
+                if (data.length === 1) {
+                    // Pre-fill the fields
+                    const item = data[0];
+                    document.getElementById('name').value = item.name || '';
+                    document.getElementById('quantity').value = item.quantity || '';
+                    document.getElementById('box').value = item.location.box || '';
+
+                    // Set boat section and shelf
+                    setSelectOptionByText(boatSectionSelect, item.location.section);
+                    if (item.location.section) {
+                        populateShelves(item.location.section, item.location.shelf);
+                    }
+
+                    // Enable the fields
+                    disableFields(false);
+                } else if (data.length > 1) {
+                    // Display search results if multiple items are found
+                    showSearchResults(data);
+                    disableFields(true);
+                } else {
+                    // No items found, clear other fields and enable for new entry
+                    clearFields();
+                    disableFields(false);
+                }
+            } catch (error) {
+                console.error('Error fetching inventory data:', error);
+                alert('Failed to retrieve item data.');
+                disableFields(true);
+            }
+        } else {
+            alert('Please enter a serial number.');
+        }
+    });
+
+    // Boat Section Change Trigger
+    boatSectionSelect.addEventListener('change', function () {
+        const selectedBoatSection = boatSectionSelect.options[boatSectionSelect.selectedIndex].text;
+        if (selectedBoatSection === 'Add New Section') {
+            document.getElementById('new-section-input').classList.remove('hidden');
+        } else {
+            document.getElementById('new-section-input').classList.add('hidden');
+            populateShelves(selectedBoatSection);
+        }
+    });
+
+    // Populate Shelves Based on Boat Section
+    async function populateShelves(boatSectionName, selectedShelf = null) {
+        try {
+            const response = await fetch(`/inventory/shelves?boat_section=${encodeURIComponent(boatSectionName)}`);
+            const shelves = await response.json();
+
+            // Clear current shelves
+            shelfSelect.innerHTML = '<option value="">Select Shelf</option><option value="new_shelf">Add New Shelf</option>';
+
+            // Add new shelves to the dropdown
+            shelves.forEach(shelf => {
+                const option = document.createElement('option');
+                option.value = shelf;
+                option.textContent = shelf;
+                if (shelf === selectedShelf) {
+                    option.selected = true;
+                }
+                shelfSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching shelves:', error);
+            alert('Failed to retrieve shelves.');
+        }
+    }
+
+    // Helper function to clear all input fields
+    function clearFields() {
+        nameInput.value = '';
+        partNumberInput.value = '';
+        quantityInput.value = '';
+        boxInput.value = '';
+        boatSectionSelect.value = '';
+        shelfSelect.innerHTML = '<option value="">Select Shelf</option><option value="new_shelf">Add New Shelf</option>';
+    }
+
+    // Helper function to disable/enable all input fields except serial number
+    function disableFields(disable) {
+        nameInput.disabled = disable;
+        partNumberInput.disabled = disable;
+        quantityInput.disabled = disable;
+        boxInput.disabled = disable;
+        boatSectionSelect.disabled = disable;
+        shelfSelect.disabled = disable;
+    }
+
+    // Helper function to set a select element's option by text
+    function setSelectOptionByText(selectElement, text) {
+        for (let i = 0; i < selectElement.options.length; i++) {
+            if (selectElement.options[i].text === text) {
+                selectElement.selectedIndex = i;
+                return;
+            }
+        }
+    }
+
+    // Function to display multiple search results
+  function showSearchResults(data) {
+      const resultsBody = document.getElementById('results-body');
+      resultsBody.innerHTML = '';
+
+      data.forEach(item => {
+          const row = document.createElement('tr');
+
+          row.innerHTML = `
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.location.section || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.location.shelf || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.location.box || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.serial_number || '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity !== null ? item.quantity : '-'}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end space-x-3">
+                      <a href="/inventory/${item.id}" class="text-blue-600 hover:text-blue-900" title="View Details">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                      </a>
+                      <a href="/inventory/${item.id}/edit" class="text-indigo-600 hover:text-indigo-900" title="Edit Item">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                      </a>
+                  </div>
+              </td>
+          `;
+          resultsBody.appendChild(row);
+      });
+
+      document.getElementById('search-results').classList.remove('hidden');
+  }
+
+});
+</script>
+{% endblock %}
+
+
+{% endblock %}

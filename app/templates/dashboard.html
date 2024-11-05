@@ -76,6 +76,30 @@
       </a>
     </div>
 
+   <!-- Action Bar Section -->
+<div class="bg-white shadow rounded-lg p-6 flex justify-around items-center mb-6">
+    <!-- Add Item Button -->
+    <button id="add-item-button" class="flex items-center px-6 py-3 text-white font-bold rounded-md transition-transform hover:scale-105 hover:shadow-lg"
+            style="background: linear-gradient(to right, #004aad, #007bff);">
+        <svg class="h-5 w-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Add Item
+    </button>
+
+    <!-- Use/Pull Item Button -->
+    <button id="use-item-button" class="flex items-center px-6 py-3 text-white font-bold rounded-md transition-transform hover:scale-105 hover:shadow-lg"
+            style="background: linear-gradient(to right, #d90429, #ef233c);">
+        <svg class="h-5 w-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12h6m-6 0a9 9 0 11-9-9 9 9 0 019 9z"/>
+        </svg>
+        Use/Pull Item
+    </button>
+</div>
+
+
+
+
     <!-- Recent Items Table -->
     <div class="bg-white shadow rounded-lg overflow-hidden">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
@@ -153,14 +177,25 @@
                 <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                     <div class="overflow-hidden border-b border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200">
+                            <colgroup>
+                                <col class="w-400px">
+                                <col class="w-150px">
+                                <col class="w-100px">
+                                <col class="w-75px">
+                                <col class="w-90px">
+                                <col class="w-90px">
+                                <col class="w-100px">
+                            </colgroup>
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                        <th class="px-4 py-3 relative"><span class="sr-only">Actions</span></th>
+                    </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 {% for item in low_stock_items %}
@@ -198,4 +233,17 @@
         </div>
     </div>
 </div>
+{% block extra_js %}
+<script>
+  document.getElementById('add-item-button').addEventListener('click', function() {
+    window.location.href = "{{ url_for('views.inventory_add') }}";
+  });
+
+  document.getElementById('use-item-button').addEventListener('click', function() {
+    window.location.href = "{{ url_for('views.inventory_use') }}";
+  });
+</script>
+{% endblock %}
+
+
 {% endblock %}
