@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - Add Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">Add Inventory</h1>
+        </div>
+
+        <!-- Add Inventory Form -->
+        <form method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded shadow">
+            <div class="space-y-4">
+                <!-- Serial Number with Search Icon -->
+                <div class="relative">
+                    <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                    <input type="text" name="serial_number" id="serial_number" class="w-full px-4 py-2 border rounded" placeholder="Enter or scan serial number">
+                    <button type="button" id="serial-search-button" class="absolute inset-y-0 right-0 px-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1111.446 3.032l4.743 4.744a1 1 0 01-1.414 1.414l-4.744-4.743A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Box -->
+                <div>
+                    <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+                    <input type="text" name="box" id="box" class="w-full px-4 py-2 border rounded" placeholder="Enter box number" disabled>
+                </div>
+
+                <!-- Boat Section -->
+                <div>
+                    <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+                    <select id="boat_section_id" name="boat_section_id" class="w-full px-4 py-2 border rounded" disabled>
+                        <option value="">Select Section</option>
+                        {% for section in sections %}
+                            <option value="{{ section.id }}">{{ section.name }}</option>
+                        {% endfor %}
+                        <option value="new_section">-->Add New Section<--</option>
+                    </select>
+                    <div id="new-section-input" class="mt-2 hidden">
+                        <label for="new_section_name" class="block text-sm font-medium text-gray-700">New Section Name</label>
+                        <input type="text" id="new_section_name" name="new_section_name" class="w-full px-4 py-2 border rounded">
+                    </div>
+                </div>
+
+                <!-- Shelf -->
+                <div>
+                    <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+                    <select id="shelf" name="shelf" class="w-full px-4 py-2 border rounded" disabled>
+                        <option value="">Select Shelf</option>
+                        <option value="new_shelf">-->Add New Shelf<--</option>
+                    </select>
+                    <div id="new-shelf-input" class="mt-2 hidden">
+                        <label for="new_shelf_name" class="block text-sm font-medium text-gray-700">New Shelf Name</label>
+                        <input type="text" id="new_shelf_name" name="new_shelf_name" class="w-full px-4 py-2 border rounded">
+                    </div>
+                </div>
+
+                <!-- Item Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
+                    <input type="text" name="name" id="name" class="w-full px-4 py-2 border rounded" placeholder="Enter item name" disabled>
+                </div>
+
+                <!-- Part Number -->
+                <div>
+                    <label for="part_number" class="block text-sm font-medium text-gray-700">Part Number</label>
+                    <input type="text" name="part_number" id="part_number" class="w-full px-4 py-2 border rounded" placeholder="Enter part number (optional)" disabled>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" class="w-full px-4 py-2 border rounded" placeholder="Enter quantity" disabled>
+                </div>
+
+                <!-- Upload New Image -->
+                <div>
+                    <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
+                    <input type="file" name="image" id="image" accept="image/*" class="w-full px-4 py-2 border rounded" disabled>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded" disabled>Add Item</button>
+            </div>
+        </form>
+    </div>
+
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const serialSearchButton = document.getElementById('serial-search-button');
+        const serialNumberInput = document.getElementById('serial_number');
+        const boatSectionSelect = document.getElementById('boat_section_id');
+        const shelfSelect = document.getElementById('shelf');
+        const nameInput = document.getElementById('name');
+        const partNumberInput = document.getElementById('part_number');
+        const quantityInput = document.getElementById('quantity');
+        const boxInput = document.getElementById('box');
+        const formElements = document.querySelectorAll('input, select, button:not(#serial-search-button)');
+
+        // Disable all form fields except for the serial number field
+        function disableFields(disable) {
+            formElements.forEach(el => {
+                if (el.id !== 'serial_number') el.disabled = disable;
+            });
+        }
+        disableFields(true); // Initial disable
+
+        // Serial Number Search Trigger
+        serialSearchButton.addEventListener('click', async function () {
+            const serialNumber = serialNumberInput.value.trim();
+            if (serialNumber) {
+                try {
+                    const response = await fetch(`/inventory/data?serial=${serialNumber}`);
+                    const data = await response.json();
+
+                    if (data.length === 1) {
+                        // Pre-fill the fields if the item is found
+                        const item = data[0];
+                        nameInput.value = item.name || '';
+                        partNumberInput.value = item.part_number || '';
+                        quantityInput.value = item.quantity || '';
+                        boxInput.value = item.location.box || '';
+
+                        // Set boat section and populate shelves
+                        setSelectOptionByText(boatSectionSelect, item.location.section);
+                        if (item.location.section) {
+                            await populateShelves(item.location.section, item.location.shelf);
+                        }
+
+                        // Enable all fields for editing
+                        disableFields(false);
+                    } else {
+                        // Clear the fields if not found or multiple items returned
+                        clearFields();
+                        disableFields(false); // Allow new entry
+                    }
+                } catch (error) {
+                    console.error('Error fetching inventory data:', error);
+                    alert('Failed to retrieve item data.');
+                }
+            } else {
+                alert('Please enter a serial number.');
+            }
+        });
+
+        // Boat Section Change Trigger
+        boatSectionSelect.addEventListener('change', async function () {
+            const selectedBoatSection = boatSectionSelect.options[boatSectionSelect.selectedIndex].text;
+            if (selectedBoatSection === 'Add New Section') {
+                document.getElementById('new-section-input').classList.remove('hidden');
+            } else {
+                document.getElementById('new-section-input').classList.add('hidden');
+                await populateShelves(selectedBoatSection);
+            }
+        });
+
+        // Populate shelves based on boat section
+        async function populateShelves(boatSectionName, selectedShelf = null) {
+            try {
+                const response = await fetch(`/inventory/shelves?boat_section=${encodeURIComponent(boatSectionName)}`);
+                const shelves = await response.json();
+
+                // Clear current shelves
+                shelfSelect.innerHTML = '<option value="">Select Shelf</option>';
+
+                // Add shelves to the dropdown
+                shelves.forEach(shelf => {
+                    const option = document.createElement('option');
+                    option.value = shelf;
+                    option.textContent = shelf;
+                    if (shelf === selectedShelf) {
+                        option.selected = true;
+                    }
+                    shelfSelect.appendChild(option);
+                });
+
+                // Add the 'Add New Shelf' option at the end
+                const newShelfOption = document.createElement('option');
+                newShelfOption.value = 'new_shelf';
+                newShelfOption.textContent = '-->Add New Shelf<--';
+                shelfSelect.appendChild(newShelfOption);
+            } catch (error) {
+                console.error('Error fetching shelves:', error);
+                alert('Failed to retrieve shelves.');
+            }
+        }
+
+        // Add 'Add New Section' option at the end of the boat section dropdown
+        function initializeBoatSectionDropdown() {
+            // Check if the "Add New Section" option already exists
+            const existingOption = Array.from(boatSectionSelect.options).find(option => option.value === 'new_section');
+            if (!existingOption) {
+                const newSectionOption = document.createElement('option');
+                newSectionOption.value = 'new_section';
+                newSectionOption.textContent = '-->Add New Section<--';
+                boatSectionSelect.appendChild(newSectionOption);
+            }
+        }
+
+
+        initializeBoatSectionDropdown();
+
+
+        // Helper function to set a select element's option by text
+        function setSelectOptionByText(selectElement, text) {
+            for (let i = 0; i < selectElement.options.length; i++) {
+                if (selectElement.options[i].text === text) {
+                    selectElement.selectedIndex = i;
+                    return;
+                }
+            }
+        }
+
+        // Helper function to clear all input fields
+        function clearFields() {
+            nameInput.value = '';
+            partNumberInput.value = '';
+            quantityInput.value = '';
+            boxInput.value = '';
+            boatSectionSelect.value = '';
+            shelfSelect.innerHTML = '<option value="">Select Shelf</option><option value="new_shelf">Add New Shelf</option>';
+        }
+    });
+</script>
+
+</body>
+</html>

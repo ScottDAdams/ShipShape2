@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col justify-center items-center">
+        <h1 class="text-2xl font-bold mb-8">Mobile Dashboard</h1>
+        <div class="flex items-center justify-center h-16">
+                <div class="flex items-center space-x-2">
+                    <img src="{{ url_for('static', filename='img/shipicon.png') }}"
+                         class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                    <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+                </div>
+            </div>
+
+        <div class="w-full max-w-sm space-y-6">
+            <a href="{{ url_for('views.mobile_search') }}" class="block w-full bg-blue-500 text-white text-center py-4 rounded-lg hover:bg-blue-600">Search Inventory</a>
+            <a href="{{ url_for('views.mobile_add') }}" class="block w-full bg-green-500 text-white text-center py-4 rounded-lg hover:bg-green-600">Add Inventory</a>
+            <a href="{{ url_for('views.mobile_use') }}" class="block w-full bg-yellow-500 text-white text-center py-4 rounded-lg hover:bg-yellow-600">Pull/Use Inventory</a>
+            <a href="{{ url_for('views.mobile_cycle_count') }}" class="block w-full bg-gray-700-500 text-white text-center py-4 rounded-lg hover:bg-gray-950">Cycle Count</a>
+            <a href="{{ url_for('views.mobile_logout') }}" class="block w-full bg-red-500 text-white text-center py-4 rounded-lg hover:bg-red-600">Logout</a>
+
+        </div>
+    </div>
+</body>
+</html>

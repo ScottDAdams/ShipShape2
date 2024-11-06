@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - Use/Pull Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">Use/Pull Inventory</h1>
+        </div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Use Item</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Adjust item quantity as items are used.</p>
+            </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="border-t border-gray-200">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Name</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.name }}</dd>
+                </div>
+
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Location</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {% if item.boat_section %}
+                            {{ item.boat_section.name }}
+                            {% if item.shelf or item.box %}
+                                <span class="text-gray-500">
+                                    ({% if item.shelf %}Shelf: {{ item.shelf }}{% endif %}
+                                     {% if item.box %}Box: {{ item.box }}{% endif %})
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </dd>
+                </div>
+
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Quantity</dt>
+                    <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2">
+                        <form method="POST" action="{{ url_for('views.use_inventory_item', item_id=item.id) }}">
+                           <!-- Quantity Field (Editable) -->
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                                <input type="number" name="quantity" id="quantity" value="{{ item.quantity }}"
+                                       class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                       placeholder="Enter quantity">
+                            </div>
+
+                            <!-- Save Changes Button -->
+                            <button type="submit" class="btn btn-primary mt-4" style="background-color: #07448d; color: white;">Save Changes</button>
+                        </form>
+                    </dd>
+                </div>
+
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Serial Number</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.serial_number or '-' }}</dd>
+                </div>
+
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Part Number</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.part_number or '-' }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

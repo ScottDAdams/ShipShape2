@@ -1,0 +1,27 @@
+<div class="container mx-auto px-4 py-6">
+  <h2 class="text-xl font-bold">Item: {{ item.name }}</h2>
+  <div class="details mt-4">
+    <p><strong>Boat Section:</strong> {{ item.boat_section.name if item.boat_section else 'N/A' }}</p>
+    <p><strong>Shelf:</strong> {{ item.shelf if item.shelf else 'N/A' }}</p>
+    <p><strong>Box:</strong> {{ item.box if item.box else 'N/A' }}</p>
+    <p><strong>Part Number:</strong> {{ item.part_number or 'N/A' }}</p>
+    <p><strong>Serial Number:</strong> {{ item.serial_number }}</p>
+    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+  </div>
+  <div class="images mt-4">
+    <h3 class="text-lg font-bold">Images:</h3>
+    {% if item.photos and item.photos|length > 0 %}
+      {% for photo in item.photos %}
+      <img src="{{ photo.url }}" alt="Photo of {{ item.name }}" class="w-full mt-2">
+      {% endfor %}
+    {% else %}
+    <img src="/static/img/no-pictures.png" alt="No image available" class="w-full mt-2">
+    {% endif %}
+  </div>
+  <div class="actions mt-6">
+    <a href="/mobile/edit/{{ item.id }}" class="block text-center w-full py-2 bg-green-500 text-white rounded">Edit Item</a>
+    <form method="POST" action="/mobile/delete/{{ item.id }}" class="mt-4">
+      <button type="submit" class="w-full py-2 bg-red-500 text-white rounded">Delete Item</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - Edit Item</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">Edit Item: {{ item.name }}</h1>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid grid-cols-1 gap-4">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" name="name" id="name" value="{{ item.name }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Boat Section -->
+                <div>
+                    <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+                    <select id="boat_section_id" name="boat_section_id" class="w-full px-4 py-2 border rounded">
+                        <option value="">Select Section</option>
+                        {% for section in sections %}
+                            <option value="{{ section.id }}" {% if item.boat_section and section.id == item.boat_section.id %}selected{% endif %}>
+                                {{ section.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Shelf -->
+                <div>
+                    <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+                    <input type="text" name="shelf" id="shelf" value="{{ item.shelf }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Box -->
+                <div>
+                    <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+                    <input type="text" name="box" id="box" value="{{ item.box }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" value="{{ item.quantity }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Serial Number -->
+                <div>
+                    <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                    <input type="text" name="serial_number" id="serial_number" value="{{ item.serial_number or 'None' }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Part Number -->
+                <div>
+                    <label for="part_number" class="block text-sm font-medium text-gray-700">Part Number</label>
+                    <input type="text" name="part_number" id="part_number" value="{{ item.part_number or 'None' }}" class="w-full px-4 py-2 border rounded">
+                </div>
+
+                <!-- Image Upload -->
+                <div>
+                    <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
+                    <input type="file" name="image" id="image" accept="image/*" class="w-full px-4 py-2 border rounded">
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-6">
+                <button type="submit" class="w-full py-2 bg-green-500 text-white rounded">Save Changes</button>
+            </div>
+        </form>
+
+        <!-- Delete Button -->
+        <div class="mt-6">
+            <form method="POST" action="{{ url_for('views.mobile_inventory_delete', item_id=item.id) }}"
+                  onsubmit="return confirm('Are you sure you want to delete this item?');">
+                <button type="submit" class="w-full py-2 bg-red-500 text-white rounded">Delete Item</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - View Item</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">{{ item.name }}</h1>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <!-- Item Details -->
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Item Details</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Item information and properties.</p>
+            </div>
+
+            <div class="border-t border-gray-200">
+                <!-- Images Section -->
+                <div class="px-4 py-5 sm:px-6">
+                    <div class="text-sm font-medium text-gray-500">Images</div>
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        {% if item.photos %}
+                            {% for photo in item.photos %}
+                            <div class="relative group">
+                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-100">
+                                    <img src="{{ url_for('static', filename=photo.url) }}"
+                                         alt="Photo of {{ item.name }}"
+                                         class="object-cover group-hover:opacity-75">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="relative group">
+                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                                    <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
+                                         alt="No image available"
+                                         class="object-contain w-full h-full">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span class="text-sm text-gray-500">No image available</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Details List -->
+                <div class="px-4 py-5 sm:px-6">
+                    <dl class="grid grid-cols-1 gap-x-4 gap-y-6">
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Name</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ item.name }}</dd>
+                        </div>
+
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Location</dt>
+                            <dd class="mt-1 text-sm text-gray-900">
+                                {% if item.boat_section %}
+                                    {{ item.boat_section.name }}
+                                    {% if item.shelf or item.box %}
+                                        <span class="text-gray-500">
+                                            ({% if item.shelf %}Shelf: {{ item.shelf }}{% endif %}
+                                            {% if item.box %}Box: {{ item.box }}{% endif %})
+                                        </span>
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </dd>
+                        </div>
+
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Quantity</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ item.quantity|default(0) }}</dd>
+                        </div>
+
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Serial Number</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ item.serial_number or '-' }}</dd>
+                        </div>
+
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500">Part Number</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ item.part_number or '-' }}</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="px-4 py-5 sm:px-6 space-y-3">
+                    <a href="{{ url_for('views.mobile_edit_inventory_item', item_id=item.id) }}"
+                       class="block text-center w-full py-2 bg-blue-500 text-white rounded">
+                        Edit Item
+                    </a>
+                    <form method="POST" action="{{ url_for('views.mobile_inventory_delete', item_id=item.id) }}"
+                          onsubmit="return confirm('Are you sure you want to delete this item?');">
+                        <button type="submit" class="w-full py-2 bg-red-500 text-white rounded">Delete Item</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

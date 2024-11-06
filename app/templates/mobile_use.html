@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - Use/Pull Inventory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">Use/Pull Inventory</h1>
+        </div>
+
+        <!-- Serial Number Search -->
+        <div class="relative mb-4">
+            <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+            <input type="text" id="serial_number" class="w-full px-4 py-2 border rounded" placeholder="Enter or scan serial number">
+            <button type="button" id="serial-search-button" class="absolute inset-y-0 right-0 px-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1111.446 3.032l4.743 4.744a1 1 0 01-1.414 1.414l-4.744-4.743A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Use/Pull Inventory Form -->
+        <form id="inventory-form" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded shadow">
+            <div class="space-y-4">
+                <!-- Box -->
+                <div>
+                    <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+                    <input type="text" name="box" id="box" class="w-full px-4 py-2 border rounded bg-gray-100" placeholder="Box number" disabled>
+                </div>
+
+                <!-- Boat Section -->
+                <div>
+                    <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+                    <select id="boat_section_id" name="boat_section_id" class="w-full px-4 py-2 border rounded bg-gray-100" disabled>
+                        <option value="">Select Section</option>
+                        {% for section in sections %}
+                            <option value="{{ section.id }}">{{ section.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Shelf -->
+                <div>
+                    <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+                    <select id="shelf" name="shelf" class="w-full px-4 py-2 border rounded bg-gray-100" disabled>
+                        <option value="">Select Shelf</option>
+                    </select>
+                </div>
+
+                <!-- Item Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Item Name</label>
+                    <input type="text" name="name" id="name" class="w-full px-4 py-2 border rounded bg-gray-100" placeholder="Item name" disabled>
+                </div>
+
+                <!-- Part Number -->
+                <div>
+                    <label for="part_number" class="block text-sm font-medium text-gray-700">Part Number</label>
+                    <input type="text" name="part_number" id="part_number" class="w-full px-4 py-2 border rounded bg-gray-100" placeholder="Part number" disabled>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" class="w-full px-4 py-2 border rounded bg-gray-100" placeholder="Enter quantity" disabled>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded" disabled>Pull Item</button>
+            </div>
+        </form>
+
+        <!-- Search Results for Multiple Items -->
+        <div id="inventory-results" class="space-y-4 hidden">
+            <!-- Inventory Item (Dynamically generated) -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const serialSearchButton = document.getElementById('serial-search-button');
+            const serialNumberInput = document.getElementById('serial_number');
+            const inventoryResults = document.getElementById('inventory-results');
+            const inventoryForm = document.getElementById('inventory-form');
+            const nameInput = document.getElementById('name');
+            const partNumberInput = document.getElementById('part_number');
+            const quantityInput = document.getElementById('quantity');
+            const boxInput = document.getElementById('box');
+            const boatSectionSelect = document.getElementById('boat_section_id');
+            const shelfSelect = document.getElementById('shelf');
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            // Initial state: all fields disabled except serial number
+            disableFields(true);
+
+            // Serial Number Search Trigger
+            serialSearchButton.addEventListener('click', async function() {
+                const serialNumber = serialNumberInput.value.trim();
+                if (serialNumber) {
+                    try {
+                        const response = await fetch(`/inventory/data?serial=${serialNumber}`);
+                        const items = await response.json();
+
+                        inventoryResults.innerHTML = ''; // Clear previous results
+                        inventoryForm.style.display = 'block'; // Ensure form is visible
+                        inventoryResults.classList.add('hidden');
+
+                        if (items.length === 1) {
+                            const item = items[0];
+                            // Fill form fields
+                            nameInput.value = item.name || '';
+                            partNumberInput.value = item.part_number || '';
+                            quantityInput.value = item.quantity || '';
+                            boxInput.value = item.location.box || '';
+                            setSelectOptionByText(boatSectionSelect, item.location.section);
+                            await populateShelves(item.location.section, item.location.shelf);
+
+                            // Enable only the quantity field and submit button
+                            quantityInput.disabled = false;
+                            quantityInput.classList.remove('bg-gray-100');
+                            submitButton.disabled = false;
+
+                        } else if (items.length > 1) {
+                            // Hide form and show multiple results
+                            inventoryForm.style.display = 'none';
+                            inventoryResults.classList.remove('hidden');
+                            items.forEach(item => {
+                                const itemContainer = document.createElement('div');
+                                itemContainer.classList.add('bg-white', 'p-4', 'rounded', 'shadow', 'flex', 'justify-between', 'items-center', 'mb-4');
+
+                                itemContainer.innerHTML = `
+                                    <div class="details">
+                                        <p class="font-bold">ITEM: ${item.name}</p>
+                                        <p>BOAT SECTION: ${item.location.section}</p>
+                                        <p>SHELF: ${item.location.shelf}</p>
+                                        <p>BOX: ${item.location.box}</p>
+                                        <p>PART NUMBER: ${item.part_number || 'N/A'}</p>
+                                        <p>SERIAL NUMBER: ${item.serial_number}</p>
+                                        <p>QUANTITY: ${item.quantity}</p>
+                                    </div>
+                                    <div class="actions flex space-x-2">
+                                        <a href="/mobile/part/use/${item.id}" class="text-green-600 hover:text-green-900" title="Use Item">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                `;
+                                inventoryResults.appendChild(itemContainer);
+                            });
+                        } else {
+                            inventoryResults.classList.remove('hidden');
+                            inventoryResults.innerHTML = `<p class="text-gray-500 text-center">No items found for serial number "${serialNumber}".</p>`;
+                            inventoryForm.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error fetching inventory data:', error);
+                        alert('An error occurred while retrieving the data.');
+                    }
+                } else {
+                    alert('Please enter a serial number.');
+                }
+            });
+
+            // Helper function to set a select element's option by text
+            function setSelectOptionByText(selectElement, text) {
+                for (let i = 0; i < selectElement.options.length; i++) {
+                    if (selectElement.options[i].text === text) {
+                        selectElement.selectedIndex = i;
+                        return;
+                    }
+                }
+            }
+
+            // Function to populate shelves based on the boat section
+            async function populateShelves(boatSectionName, selectedShelf = null) {
+                try {
+                    const response = await fetch(`/inventory/shelves?boat_section=${encodeURIComponent(boatSectionName)}`);
+                    const shelves = await response.json();
+
+                    shelfSelect.innerHTML = '<option value="">Select Shelf</option>';
+
+                    // Add shelves to the dropdown
+                    shelves.forEach(shelf => {
+                        const option = document.createElement('option');
+                        option.value = shelf;
+                        option.textContent = shelf;
+                        if (shelf === selectedShelf) {
+                            option.selected = true;
+                        }
+                        shelfSelect.appendChild(option);
+                    });
+
+                    // Add the 'Add New Shelf' option at the end
+                    const newShelfOption = document.createElement('option');
+                    newShelfOption.value = 'new_shelf';
+                    newShelfOption.textContent = '-->Add New Shelf<--';
+                    shelfSelect.appendChild(newShelfOption);
+                } catch (error) {
+                    console.error('Error fetching shelves:', error);
+                    alert('Failed to retrieve shelves.');
+                }
+            }
+
+            // Enable or disable fields based on user interaction
+            function disableFields(disable) {
+                document.querySelectorAll('#inventory-form input, #inventory-form select, #inventory-form button').forEach(el => {
+                    if (el.id !== 'serial_number') {
+                        el.disabled = disable;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

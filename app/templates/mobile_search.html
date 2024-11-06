@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipShape - Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header with centered clickable logo and title -->
+        <div class="flex flex-col items-center mb-4">
+            <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
+                <span class="text-blue-950 text-lg font-semibold">ShipShape</span>
+            </a>
+            <h1 class="text-2xl font-bold mt-2">Inventory Search</h1>
+        </div>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('views.mobile_search') }}" method="GET" class="mb-6">
+            <div class="space-y-4">
+                <div>
+                    <label for="serial" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                    <input type="text" name="serial" id="serial" value="{{ request.args.get('serial', '') }}"
+                           class="w-full px-4 py-2 border rounded" placeholder="Enter serial number">
+                </div>
+                <div>
+                    <label for="q" class="block text-sm font-medium text-gray-700">Search</label>
+                    <input type="text" name="q" id="q" value="{{ request.args.get('q', '') }}"
+                           class="w-full px-4 py-2 border rounded" placeholder="Search by name, part number, etc.">
+                </div>
+                <button type="submit" class="w-full py-2 bg-blue-500 text-white rounded">Search</button>
+            </div>
+        </form>
+
+        <!-- Search Results -->
+        {% if items %}
+            <div class="space-y-4">
+                {% for item in items %}
+                    <div class="bg-white p-4 rounded shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold">{{ item.name }}</h3>
+                                <div class="mt-1 text-sm text-gray-600">
+                                    <p>Section: {{ item.boat_section.name if item.boat_section else 'N/A' }}</p>
+                                    <p>Shelf: {{ item.shelf or 'N/A' }}</p>
+                                    <p>Box: {{ item.box or 'N/A' }}</p>
+                                    <p>Serial: {{ item.serial_number or 'N/A' }}</p>
+                                    <p>Quantity: {{ item.quantity }}</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <!-- View Button -->
+                                <a href="{{ url_for('views.mobile_view_inventory_item', item_id=item.id) }}"
+                                   class="text-blue-600 hover:text-blue-900"
+                                   title="View Item Details">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                <!-- Edit Button -->
+                                <a href="{{ url_for('views.mobile_edit_inventory_item', item_id=item.id) }}"
+                                   class="text-green-600 hover:text-green-900"
+                                   title="Edit Item">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if request.args.get('serial') or request.args.get('q') %}
+                <div class="text-center text-gray-500 py-8">
+                    No items found matching your search criteria.
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
