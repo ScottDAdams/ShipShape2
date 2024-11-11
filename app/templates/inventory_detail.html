@@ -1,107 +1,91 @@
+{# inventory_detail.html #}
 {% extends "base.html" %}
 {% block title %}{{ item.name }}{% endblock %}
 {% block content %}
-
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
             <div>
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Item Details</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">Item information and properties.</p>
+                <p>Item information and properties.</p>
             </div>
-
             <a href="{{ url_for('views.inventory_edit', item_id=item.id) }}"
                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewbox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Edit Item
             </a>
         </div>
 
-        <!-- Photos Section -->
         <div class="border-t border-gray-200">
             <div class="px-4 py-5 sm:px-6">
                 <h4 class="text-sm font-medium text-gray-500">Images</h4>
+
                 <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                    {% if item.photos %}
+                    {% if item.photos and item.photos|length > 0 %}
                         {% for photo in item.photos %}
-                        <div class="relative group">
-                            <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-100">
-                                <img src="{{ url_for('static', filename=photo.url) }}"
-                                     alt="Photo of {{ item.name }}"
-                                     class="object-cover group-hover:opacity-75">
+                            <div class="relative group">
+                                <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-100">
+                                    <img src="data:image/jpeg;base64,{{ photo.get_image_b64() }}"
+                                         alt="Photo of {{ item.name }}"
+                                         class="object-cover group-hover:opacity-75">
+                                </div>
                             </div>
-                        </div>
                         {% endfor %}
                     {% else %}
-                    <div class="relative group">
-                        <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                            <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
-                                 alt="No image available"
-                                 class="object-contain w-full h-full">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span class="text-sm text-gray-500">No image available</span>
+                        <div class="relative group">
+                            <div class="aspect-w-1 aspect-h-1 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
+                                <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
+                                     alt="No image available"
+                                     class="object-contain w-full h-full">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-sm text-gray-500">No image available</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Details Grid -->
         <div class="border-t border-gray-200">
-            <dl>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Name</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.name }}</dd>
-                </div>
+            <dl class="px-4 py-5 sm:px-6">
+                <dt class="font-medium">Name</dt>
+                <dd class="mt-1 mb-4">{{ item.name }}</dd>
 
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Location</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {% if item.boat_section %}
-                            {{ item.boat_section.name }}
-                            {% if item.shelf or item.box %}
-                                <span class="text-gray-500">
-                                    ({% if item.shelf %}Shelf: {{ item.shelf }}{% endif %}
-                                     {% if item.box %}Box: {{ item.box }}{% endif %})
-                                </span>
-                            {% endif %}
-                        {% else %}
-                            -
+                <dt class="font-medium">Location</dt>
+                <dd class="mt-1 mb-4">
+                    {% if item.boat_section %}
+                        {{ item.boat_section.name }}
+                        {% if item.shelf or item.box %}
+                            <span class="text-gray-500">
+                                ({% if item.shelf %}Shelf: {{ item.shelf }}{% endif %}
+                                {% if item.box %}Box: {{ item.box }}{% endif %})
+                            </span>
                         {% endif %}
-                    </dd>
-                </div>
+                    {% else %}
+                        -
+                    {% endif %}
+                </dd>
 
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Quantity</dt>
-                    <dd class="mt-1 text-sm sm:mt-0 sm:col-span-2 {% if item.quantity|default(0, true) < 5 %}text-red-600 font-medium{% else %}text-gray-900{% endif %}">
-                        {{ item.quantity|default(0) }}
-                    </dd>
-                </div>
+                <dt class="font-medium">Quantity</dt>
+                <dd class="mt-1 mb-4">{{ item.quantity|default(0) }}</dd>
 
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Serial Number</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.serial_number or '-' }}</dd>
-                </div>
+                <dt class="font-medium">Serial Number</dt>
+                <dd class="mt-1 mb-4">{{ item.serial_number or '-' }}</dd>
 
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Part Number</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ item.part_number or '-' }}</dd>
-                </div>
+                <dt class="font-medium">Part Number</dt>
+                <dd class="mt-1 mb-4">{{ item.part_number or '-' }}</dd>
             </dl>
         </div>
 
-        <!-- Delete Button -->
         <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
             <form method="POST" action="{{ url_for('views.inventory_delete', item_id=item.id) }}"
-                  onsubmit="return confirm('Are you sure you want to delete this item?');"
-                  class="flex justify-end">
+                  onsubmit="return confirm('Are you sure you want to delete this item?');">
                 <button type="submit"
                         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewbox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                     Delete Item
@@ -110,5 +94,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

@@ -115,25 +115,33 @@
             <h4 class="text-sm font-medium text-gray-500">Current Images</h4>
             <div class="mt-4 flex flex-col items-center justify-center">
               {% if item.photos and item.photos|length > 0 %}
-                {% for photo in item.photos %}
-                  <img src="{{ photo.url }}" 
-                       alt="Photo of {{ item.name }}"
-                       class="h-64 w-64 object-cover rounded-md shadow-lg mb-4">
-                {% endfor %}
+                  <div class="mt-4 flex flex-col items-center justify-center">
+                      {% for photo in item.photos %}
+                          <img src="data:image/jpeg;base64,{{ photo.get_image_b64() }}"
+                               alt="Photo of {{ item.name }}"
+                               class="h-64 w-64 object-cover rounded-md shadow-lg mb-4">
+                      {% endfor %}
+                  </div>
               {% else %}
-                <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
-                     alt="No image available"
-                     class="h-64 w-64 object-cover rounded-md shadow-lg">
-                <p class="mt-2 text-sm text-gray-500">No image available. Upload one below.</p>
+                  <div class="mt-4 flex flex-col items-center justify-center">
+                      <img src="{{ url_for('static', filename='img/no-pictures.png') }}"
+                           alt="No image available"
+                           class="h-64 w-64 object-cover rounded-md shadow-lg">
+                      <p class="text-gray-500 text-sm mt-2">No image available. Upload one below.</p>
+                  </div>
               {% endif %}
+
             </div>
           </div>
 
           <!-- Upload New Image -->
           <div class="col-span-6 sm:col-span-3">
-            <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
-            <input type="file" name="image" id="image" accept="image/*"
-                   class="mt-1 block w-full shadow-sm sm:text-sm">
+              <label for="image" class="block text-sm font-medium text-gray-700">Upload New Image</label>
+              <input type="file"
+                     name="image"
+                     id="image"
+                     accept="image/*"
+                     class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
           </div>
         </div>
       </div>
