@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from app.models.item import Item
 from app.models.photo import Photo
 
-
 # Load environment variables from .env file
 load_dotenv(dotenv_path='.env')
 
@@ -30,8 +29,8 @@ def import_photos():
             if not filename.lower().endswith(('.jpg', '.jpeg', '.png')):
                 continue
 
-            # Extract serial number from filename (e.g., 2100 from 2100.jpg or 2100.1.jpg)
-            serial_number = filename.split('.')[0]
+            # Extract the serial number prefix (e.g., '2407' from '2407.jpg' or '2407-2.jpg')
+            serial_number = filename.split('.')[0].split('-')[0]
 
             # Query items with this serial number
             items = session.query(Item).filter(Item.serial_number == serial_number).all()
