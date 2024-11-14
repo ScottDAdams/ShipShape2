@@ -43,92 +43,66 @@
                    class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                    placeholder="Detected name will appear here"></textarea>
           </div>
-            <!-- Additional Fields -->
-            <div class="space-y-4">
-                <div>
-                    <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
-                    <input type="number" name="quantity" id="quantity" class="w-full px-4 py-2 border rounded" placeholder="Enter quantity">
-                </div>
-                <div>
-                    <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
-                    <input type="text" name="box" id="box" class="w-full px-4 py-2 border rounded" placeholder="Enter box number">
-                </div>
-                <!-- Boat Section -->
-                <div class="col-span-6 sm:col-span-3">
-                    <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
-                    <select id="boat_section_id" name="boat_section_id"
-                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="">Select Section</option>
-                        {% for section in sections %}
-                            <option value="{{ section.id }}">{{ section.name }}</option>
-                        {% endfor %}
-                        <option value="new_section">Add New Section</option>
-                    </select>
-                    <div id="new-section-input" class="mt-2 hidden">
-                        <label for="new_section_name" class="text-sm font-medium text-gray-700">New Section Name</label>
-                        <input type="text" id="new_section_name" name="new_section_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
 
-                <!-- Shelf -->
-                <div class="col-span-6 sm:col-span-2">
-                    <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
-                    <select id="shelf" name="shelf"
-                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        <option value="">Select Shelf</option>
-                        <option value="new_shelf">Add New Shelf</option>
-                    </select>
-                    <div id="new-shelf-input" class="mt-2 hidden">
-                        <label for="new_shelf_name" class="text-sm font-medium text-gray-700">New Shelf Name</label>
-                        <input type="text" id="new_shelf_name" name="new_shelf_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
-                </div>
+          <!-- Quantity Field -->
+          <div class="col-span-6 sm:col-span-3">
+            <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+            <input type="number" name="quantity" id="quantity" class="w-full px-4 py-2 border rounded" placeholder="Enter quantity" value="1">
+          </div>
+
+          <!-- More Details Button -->
+          <div class="col-span-6">
+            <button type="button" id="more-details-button" class="w-full py-2 bg-gray-300 text-gray-700 rounded">More Details</button>
+          </div>
+
+          <!-- Additional Fields (Initially Hidden) -->
+          <div id="additional-fields" class="col-span-6 grid grid-cols-6 gap-6 hidden mt-4">
+            <!-- Box -->
+            <div class="col-span-6 sm:col-span-2">
+              <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+              <input type="text" name="box" id="box" class="w-full px-4 py-2 border rounded" placeholder="Enter box number">
             </div>
 
-            <!-- Save Button -->
-            <div class="mt-4">
-                <button type="submit" class="w-full py-2 bg-green-500 text-white rounded">Add Item</button>
+            <!-- Boat Section -->
+            <div class="col-span-6 sm:col-span-3">
+              <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+              <select id="boat_section_id" name="boat_section_id"
+                      class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                  <option value="">Select Section</option>
+                  {% for section in sections %}
+                      <option value="{{ section.id }}">{{ section.name }}</option>
+                  {% endfor %}
+                  <option value="new_section">--> Add New Section <--</option>
+              </select>
+              <div id="new-section-input" class="mt-2 hidden">
+                <label for="new_section_name" class="text-sm font-medium text-gray-700">New Section Name</label>
+                <input type="text" id="new_section_name" name="new_section_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
 
+            <!-- Shelf -->
+            <div class="col-span-6 sm:col-span-2">
+              <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+              <select id="shelf" name="shelf"
+                      class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                  <option value="">Select Shelf</option>
+                  <option value="new_shelf">--> Add New Shelf <--</option>
+              </select>
+              <div id="new-shelf-input" class="mt-2 hidden">
+                <label for="new_shelf_name" class="text-sm font-medium text-gray-700">New Shelf Name</label>
+                <input type="text" id="new_shelf_name" name="new_shelf_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="mt-4">
+          <button type="submit" class="w-full py-2 bg-green-500 text-white rounded">Add Item</button>
         </div>
       </div>
     </form>
   </div>
-
-  <!-- Search Results -->
-  <div id="search-results" class="mt-6 hidden">
-    <h4 class="text-lg leading-6 font-medium text-gray-900 mb-4">Search Results</h4>
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-      <table class="min-w-full divide-y divide-gray-200">
-        <colgroup>
-            <col class="w-400px">
-            <col class="w-150px">
-            <col class="w-100px">
-            <col class="w-75px">
-            <col class="w-90px">
-            <col class="w-90px">
-            <col class="w-100px">
-        </colgroup>
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shelf</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                <th class="px-4 py-3 relative"><span class="sr-only">Actions</span></th>
-            </tr>
-        </thead>
-        <tbody id="results-body" class="bg-white divide-y divide-gray-200">
-            <!-- Search results will be dynamically populated here -->
-        </tbody>
-    </table>
-
-    </div>
-  </div>
-</div>
-
-
 
 
 {% block extra_js %}
@@ -142,8 +116,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const nameInput = document.getElementById('name');
     const quantityInput = document.getElementById('quantity');
     const boxInput = document.getElementById('box');
+    const shelfSelect = document.getElementById('shelf');
     const imageInput = document.getElementById('image'); // The file input element
     const formElements = document.querySelectorAll('input, select, button:not(#ocr-button, #image)');
+    const moreDetailsButton = document.getElementById('more-details-button');
+    const additionalFields = document.getElementById('additional-fields');
+
+    // "More Details" button event listener
+    moreDetailsButton.addEventListener('click', function () {
+        additionalFields.classList.toggle('hidden');
+    });
 
     // Handle form submission
     form.addEventListener('submit', async function(e) {
@@ -228,19 +210,50 @@ document.addEventListener('DOMContentLoaded', function () {
     // Boat Section Change Trigger
     boatSectionSelect.addEventListener('change', async function () {
         const selectedBoatSection = boatSectionSelect.options[boatSectionSelect.selectedIndex].text;
-        if (selectedBoatSection === 'Add New Section') {
+        if (selectedBoatSection === '--> Add New Section <--') {
             document.getElementById('new-section-input').classList.remove('hidden');
         } else {
             document.getElementById('new-section-input').classList.add('hidden');
+            await populateShelves(selectedBoatSection);
         }
     });
 
-    // Helper function to clear all input fields
-    function clearFields() {
-        nameInput.value = '';
-        quantityInput.value = '';
-        boxInput.value = '';
-        boatSectionSelect.value = '';
+    // Shelf Change Trigger
+    shelfSelect.addEventListener('change', function () {
+        const selectedShelf = this.value;
+        if (selectedShelf === 'new_shelf') {
+            document.getElementById('new-shelf-input').classList.remove('hidden');
+        } else {
+            document.getElementById('new-shelf-input').classList.add('hidden');
+        }
+    });
+
+    // Function to populate shelves
+    async function populateShelves(boatSectionName) {
+        try {
+            const response = await fetch(`/inventory/shelves?boat_section=${encodeURIComponent(boatSectionName)}`);
+            const shelves = await response.json();
+
+            // Clear current shelves but keep the default and "Add New" options
+            shelfSelect.innerHTML = '<option value="">Select Shelf</option>';
+
+            // Add fetched shelves
+            shelves.forEach(shelf => {
+                const option = document.createElement('option');
+                option.value = shelf;
+                option.textContent = shelf;
+                shelfSelect.appendChild(option);
+            });
+
+            // Add the "Add New Shelf" option at the end
+            const newShelfOption = document.createElement('option');
+            newShelfOption.value = 'new_shelf';
+            newShelfOption.textContent = '--> Add New Shelf <--';
+            shelfSelect.appendChild(newShelfOption);
+        } catch (error) {
+            console.error('Error fetching shelves:', error);
+            alert('Failed to retrieve shelves.');
+        }
     }
 
     // Helper function to disable/enable all input fields except serial number, image upload, and OCR button
@@ -261,47 +274,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     }
-
-    // Function to display multiple search results
-    function showSearchResults(data) {
-        const resultsBody = document.getElementById('results-body');
-        resultsBody.innerHTML = '';
-
-        data.forEach(item => {
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.location.section || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.location.box || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.serial_number || '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity !== null ? item.quantity : '-'}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div class="flex items-center justify-end space-x-3">
-                        <a href="/inventory/${item.id}" class="text-blue-600 hover:text-blue-900" title="View Details">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                        </a>
-                        <a href="/inventory/${item.id}/edit" class="text-indigo-600 hover:text-indigo-900" title="Edit Item">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </td>
-            `;
-            resultsBody.appendChild(row);
-        });
-
-        document.getElementById('search-results').classList.remove('hidden');
-    }
 });
 </script>
 {% endblock %}
-
-
-
 
 {% endblock %}
