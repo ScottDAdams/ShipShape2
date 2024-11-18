@@ -1,54 +1,42 @@
-// static/js/ocr-handler.js
-class OCRHandler {
-    constructor() {
-        this.rawOCRText = '';
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const serialNumberInput = document.getElementById('serial_number');
+    const nameInput = document.getElementById('name');
+    const partNumberInput = document.getElementById('part_number');
+    const imageInput = document.getElementById('image');
+    const openaiButton = document.getElementById('ocr-button');
 
-    async handleOCRResult(result) {
-        // Store the raw OCR text
-        this.rawOCRText = result.raw_text;
+    openaiButton.addEventListener('click', async function() {
+        if (imageInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
 
-        // Set form field values
-        document.getElementById('serial_number').value = result.serial_number || '';
-        document.getElementById('name').value = result.name || '';
+            try {
+                const response = await fetch('https://whippet-robust-oarfish.ngrok-free.app/inventory/process_openai', {
+                    method: 'POST',
+                    body: formData
+                });
 
-        // Add visual feedback if using learned text
-        if (result.is_learned) {
-            const nameInput = document.getElementById('name');
-            const existingInfo = nameInput.parentNode.querySelector('.ocr-info');
-            if (!existingInfo) {
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'ocr-info ocr-learned';
-                infoDiv.textContent = '✓ Using learned text recognition';
-                nameInput.parentNode.appendChild(infoDiv);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const result = await response.json();
+                    if (result.serial_number) serialNumberInput.value = result.serial_number;
+                    if (result.name) nameInput.value = result.name;
+                    if (result.part_number) partNumberInput.value = result.part_number;
+                } else {
+                    console.error('Received non-JSON response:', await response.text());
+                    alert('Unexpected server response. Please check if the endpoint is correct.');
+                }
+            } catch (error) {
+                console.error('OpenAI processing error:', error);
+                alert('Failed to process with OpenAI. Please check the server or endpoint URL.');
             }
+        } else {
+            alert('Please upload an image first.');
         }
-    }
-
-    async saveCorrection(formElement) {
-        if (!this.rawOCRText) return;
-
-        const correctedText = formElement.querySelector('#name').value;
-        const serialNumber = formElement.querySelector('#serial_number').value;
-
-        try {
-            const response = await fetch('/mobile/ocr/correct', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    raw_text: this.rawOCRText,
-                    corrected_text: correctedText,
-                    serial_number: serialNumber
-                })
-            });
-
-            if (!response.ok) {
-                console.error('Failed to save OCR correction');
-            }
-        } catch (error) {
-            console.error('Error saving OCR correction:', error);
-        }
-    }
-}
+    });
+});

@@ -6,17 +6,72 @@
     <title>ShipShape - Add Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        select {
-            font-size: 1rem; /* Increase font size for dropdown select */
+        /* Style the file input */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
         }
-        select option {
-            font-size: 1rem; /* Increase font size for dropdown options */
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-input-button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Loading spinner styles */
+        .spinner-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: white;
+            margin-top: 1rem;
+            font-size: 1.125rem;
         }
     </style>
 </head>
 <body class="h-full">
     <div class="container mx-auto px-4 py-6">
-        <!-- Header with centered clickable logo and title -->
         <div class="flex flex-col items-center mb-4">
             <a href="{{ url_for('views.mobile_dashboard') }}" class="flex items-center space-x-2">
                 <img src="{{ url_for('static', filename='img/shipicon.png') }}" class="h-8 w-8 object-contain" alt="ShipShape Logo">
@@ -25,179 +80,231 @@
             <h1 class="text-2xl font-bold mt-2">Add Inventory</h1>
         </div>
 
-        <!-- Add Inventory Form -->
-        <form id="inventory-form" method="POST" enctype="multipart/form-data" class="bg-white p-4 rounded shadow">
-            <!-- Upload and OCR Trigger for Image -->
-            <input type="hidden" id="raw_ocr_text" name="raw_ocr_text">
+        <form id="inventory-form" method="POST" enctype="multipart/form-data" class="space-y-4">
             <div class="mb-4">
                 <label for="image" class="block text-sm font-medium text-gray-700">Upload or Capture Part Photo</label>
-                <input type="file" name="image" id="image" accept="image/*" capture="environment" class="w-full px-4 py-2 border rounded">
-                <button type="button" id="ocr-button" class="mt-2 w-full py-2 bg-blue-500 text-white rounded">Scan for OCR & Barcode</button>
-            </div>
+                <input type="file" name="image" id="image" accept="image/*" capture="environment"
+        class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
 
-            <!-- Serial Number Field (populated by OCR) -->
+                <button type="button" id="ocr-button" class="mt-2 w-full py-2 bg-blue-500 text-white rounded">
+                    Scan for OCR & Barcode
+                </button>
+            </div>
+        <!-- Add the loading spinner -->
+        <div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 hidden">
+            <div class="flex flex-col items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div class="text-white mt-4 text-lg">Processing Image...</div>
+            </div>
+        </div>
             <div class="relative mb-4">
-                <label for="serial_number" class="block text-lg font-medium text-gray-700">Serial Number</label>
-                <input type="text" name="serial_number" id="serial_number" class="w-full px-4 py-2 border rounded" placeholder="Enter serial number or scan with OCR">
+                <label for="serial-number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                <input type="text" id="serial-number" name="serial_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             </div>
 
-            <!-- Name Field (populated by OCR) -->
             <div class="mb-4">
-                <label for="name" class="block text-lg font-medium text-gray-700">Name</label>
-                <textarea name="name" id="name" class="w-full px-4 py-2 border rounded" placeholder="Detected name will appear here" rows="3"></textarea>
+                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             </div>
 
-            <!-- Quantity Field -->
             <div class="mb-4">
-                <label for="quantity" class="block text-lg font-medium text-gray-700">Quantity</label>
-                <input type="number" name="quantity" id="quantity" class="w-full px-4 py-2 border rounded" placeholder="Enter quantity" value="1">
+                <label for="part-number" class="block text-sm font-medium text-gray-700">Part Number</label>
+                <input type="text" id="part-number" name="part_number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             </div>
 
-            <!-- More Details Button -->
             <div class="mb-4">
-                <button type="button" id="more-details-button" class="w-full py-2 bg-gray-300 text-gray-700 rounded">More Details</button>
+                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="number" id="quantity" name="quantity" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="1">
             </div>
 
-            <!-- Additional Fields (Initially Hidden) -->
+            <button type="button" id="show-more" class="w-full py-2 bg-gray-200 text-gray-700 rounded">More Details</button>
+
             <div id="additional-fields" class="space-y-4 hidden">
                 <div>
-                    <label for="box" class="block text-lg font-medium text-gray-700">Box</label>
-                    <input type="text" name="box" id="box" class="w-full px-4 py-2 border rounded" placeholder="Enter box number">
+                    <label for="box" class="block text-sm font-medium text-gray-700">Box</label>
+                    <input type="text" id="box" name="box" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
-                <!-- Boat Section -->
+
                 <div>
-                    <label for="boat_section_id" class="block text-lg font-medium text-gray-700">Boat Section</label>
-                    <select id="boat_section_id" name="boat_section_id" class="w-full px-4 py-2 border rounded">
+                    <label for="boat_section_id" class="block text-sm font-medium text-gray-700">Boat Section</label>
+                    <select id="boat_section_id" name="boat_section_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Section</option>
                         {% for section in sections %}
                             <option value="{{ section.id }}">{{ section.name }}</option>
                         {% endfor %}
                         <option value="new_section">--> Add New Section <--</option>
                     </select>
-                    <div id="new-section-input" class="mt-2 hidden">
-                        <label for="new_section_name" class="text-lg font-medium text-gray-700">New Section Name</label>
-                        <input type="text" id="new_section_name" name="new_section_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
                 </div>
 
-                <!-- Shelf -->
                 <div>
-                    <label for="shelf" class="block text-lg font-medium text-gray-700">Shelf</label>
-                    <select id="shelf" name="shelf" class="w-full px-4 py-2 border rounded">
+                    <label for="shelf" class="block text-sm font-medium text-gray-700">Shelf</label>
+                    <select id="shelf" name="shelf" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Shelf</option>
-                        <option value="new_shelf">--> Add New Shelf <--</option>
                     </select>
-                    <div id="new-shelf-input" class="mt-2 hidden">
-                        <label for="new_shelf_name" class="text-lg font-medium text-gray-700">New Shelf Name</label>
-                        <input type="text" id="new_shelf_name" name="new_shelf_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    </div>
                 </div>
             </div>
 
-            <!-- Save Button -->
-            <div class="mt-4">
-                <button type="submit" class="w-full py-2 bg-green-500 text-white rounded">Add Item</button>
-            </div>
+            <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Add Item</button>
         </form>
     </div>
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/ocr-handler.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Define all DOM elements first
-    const ocrHandler = new OCRHandler();
-    const form = document.querySelector('form');
-    const serialNumberInput = document.getElementById('serial_number');
+    // Form elements
+    const form = document.getElementById('inventory-form') || document.querySelector('form');
+    const serialNumberInput = document.getElementById('serial_number') || document.getElementById('serial-number');
     const boatSectionSelect = document.getElementById('boat_section_id');
     const shelfSelect = document.getElementById('shelf');
     const nameInput = document.getElementById('name');
     const quantityInput = document.getElementById('quantity');
     const boxInput = document.getElementById('box');
-    const imageInput = document.getElementById('image'); // File input element
+    const imageInput = document.getElementById('image') || document.getElementById('image-upload');
     const ocrButton = document.getElementById('ocr-button');
-    const moreDetailsButton = document.getElementById('more-details-button');
+    const moreDetailsButton = document.getElementById('more-details-button') || document.getElementById('show-more');
     const additionalFields = document.getElementById('additional-fields');
-    const formElements = document.querySelectorAll('input, select, button:not(#ocr-button, #image)');
+     // Add file input handling
+    const fileInput = document.getElementById('image');
+    const fileNameDisplay = document.getElementById('file-name');
+    const loadingSpinner = document.getElementById('loading-spinner');
 
-    // Handle form submission
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        await ocrHandler.saveCorrection(this);
-        this.submit();
-    });
-
-    // OCR and Barcode scan button event
-    ocrButton.addEventListener('click', async function() {
-        if (imageInput.files.length > 0) {
-            const formData = new FormData();
-            formData.append('image', imageInput.files[0]);
-            try {
-                const response = await fetch('/mobile/ocr', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-                await ocrHandler.handleOCRResult(result);
-
-                // Enable all fields after OCR is completed
-                disableFields(false);
-            } catch (error) {
-                console.error('OCR error:', error);
-                alert('Failed to process OCR.');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                fileNameDisplay.textContent = this.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
             }
-        } else {
-            alert('Please upload an image first.');
-        }
-    });
+        });
+    }
 
-    // Handle "More Details" button to show additional fields
-    moreDetailsButton.addEventListener('click', function () {
-        additionalFields.classList.toggle('hidden');
-    });
+    // Only select form elements that exist
+    const formElements = document.querySelectorAll('input, select, button:not(#ocr-button):not(#image):not(#image-upload)');
+
+    // Check if we have the minimum required elements
+    if (!form || !imageInput) {
+        console.error('Required form elements are missing');
+        return;
+    }
 
     // Helper function to disable/enable fields
     function disableFields(disable) {
         formElements.forEach(el => {
-            if (el !== imageInput) { // Ensure the image input is never disabled
+            if (el !== imageInput) {
                 el.disabled = disable;
             }
         });
     }
 
-    // Disable all fields initially except serial number and image upload
+    // Initially disable form fields until image is processed
     disableFields(true);
 
-    // Boat Section Change Trigger
-    boatSectionSelect.addEventListener('change', async function() {
-        const selectedBoatSection = boatSectionSelect.options[boatSectionSelect.selectedIndex].text;
-        if (selectedBoatSection === '--> Add New Section <--') {
-            document.getElementById('new-section-input').classList.remove('hidden');
-            shelfSelect.disabled = true;
-        } else {
-            document.getElementById('new-section-input').classList.add('hidden');
-            shelfSelect.disabled = false;
-            await populateShelves(selectedBoatSection);
-        }
+     // Handle OCR button click with loading spinner
+    if (ocrButton) {
+        ocrButton.addEventListener('click', async function() {
+            const imageInput = document.getElementById('image');
+            if (!imageInput.files || imageInput.files.length === 0) {
+                alert('Please select an image first');
+                return;
+            }
+
+            // Show loading spinner
+            loadingSpinner.style.display = 'flex';
+            ocrButton.disabled = true;
+
+            const formData = new FormData();
+            formData.append('image', imageInput.files[0]);
+
+            try {
+                const response = await fetch('/inventory/process_openai', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Fill in the form fields with the extracted data
+                    document.getElementById('serial-number').value = data.data.serial;
+                    document.getElementById('name').value = data.data.name;
+                    document.getElementById('part-number').value = data.data.part_number;
+                    // Set default quantity to 1
+                    document.getElementById('quantity').value = 1;
+                    // Enable form fields after successful scan
+                    disableFields(false);
+                } else {
+                    alert(data.error || 'Error processing image');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing image');
+            } finally {
+                // Hide loading spinner and re-enable button
+                loadingSpinner.style.display = 'none';
+                ocrButton.disabled = false;
+            }
+        });
+    }
+
+    // Optional: Add button hover effects
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-1px)';
+        });
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
     });
 
-    // Shelf Change Trigger
-    shelfSelect.addEventListener('change', function() {
-        const selectedShelf = this.value;
-        if (selectedShelf === 'new_shelf') {
-            document.getElementById('new-shelf-input').classList.remove('hidden');
-        } else {
-            document.getElementById('new-shelf-input').classList.add('hidden');
-        }
-    });
+    // More Details button event
+    if (moreDetailsButton && additionalFields) {
+        moreDetailsButton.addEventListener('click', function() {
+            additionalFields.classList.toggle('hidden');
+        });
+    }
 
-    // Function to populate shelves
+    // Boat Section Change Handler
+    if (boatSectionSelect) {
+        boatSectionSelect.addEventListener('change', async function() {
+            const selectedBoatSection = this.options[this.selectedIndex].text;
+            const newSectionInput = document.getElementById('new-section-input');
+
+            if (selectedBoatSection === '--> Add New Section <--') {
+                if (newSectionInput) newSectionInput.classList.remove('hidden');
+                if (shelfSelect) shelfSelect.disabled = true;
+            } else {
+                if (newSectionInput) newSectionInput.classList.add('hidden');
+                if (shelfSelect) {
+                    shelfSelect.disabled = false;
+                    await populateShelves(selectedBoatSection);
+                }
+            }
+        });
+    }
+
+    // Shelf Change Handler
+    if (shelfSelect) {
+        shelfSelect.addEventListener('change', function() {
+            const selectedShelf = this.value;
+            const newShelfInput = document.getElementById('new-shelf-input');
+
+            if (selectedShelf === 'new_shelf') {
+                if (newShelfInput) newShelfInput.classList.remove('hidden');
+            } else {
+                if (newShelfInput) newShelfInput.classList.add('hidden');
+            }
+        });
+    }
+
+    // Populate Shelves Function
     async function populateShelves(boatSectionName, selectedShelf = null) {
+        if (!shelfSelect) return;
+
         try {
             const response = await fetch(`/inventory/shelves?boat_section=${encodeURIComponent(boatSectionName)}`);
             const shelves = await response.json();
 
-            // Clear current shelves but keep the default and "Add New" options
             shelfSelect.innerHTML = '<option value="">Select Shelf</option>';
 
             // Add fetched shelves
@@ -211,13 +318,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 shelfSelect.appendChild(option);
             });
 
-            // Add the "Add New Shelf" option at the end
+            // Add the "Add New Shelf" option
             const newShelfOption = document.createElement('option');
             newShelfOption.value = 'new_shelf';
             newShelfOption.textContent = '--> Add New Shelf <--';
             shelfSelect.appendChild(newShelfOption);
 
-            // Enable the shelf select
             shelfSelect.disabled = false;
 
         } catch (error) {
@@ -227,26 +333,26 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Initialize shelves if boat section is pre-selected
-    if (boatSectionSelect.value) {
+    if (boatSectionSelect && boatSectionSelect.value) {
         const selectedBoatSection = boatSectionSelect.options[boatSectionSelect.selectedIndex].text;
         populateShelves(selectedBoatSection);
     }
 
-    // OCR result handler
-    window.handleOCRResult = async function(result) {
-        await ocrHandler.handleOCRResult(result);
-        if (result.is_learned) {
-            const existingInfo = nameInput.parentNode.querySelector('.ocr-info');
-            if (!existingInfo) {
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'ocr-info ocr-learned';
-                infoDiv.textContent = '✓ Using learned text recognition';
-                nameInput.parentNode.appendChild(infoDiv);
-            }
+    // Form submission handler
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            this.submit();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Error submitting form');
         }
-    };
+    });
 });
 </script>
+
+
+
 {% endblock %}
 </body>
 </html>
